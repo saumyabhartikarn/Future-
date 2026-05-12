@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meet My Future Husband</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at top, #ffe3ef, #ff9fc3);
+  font-family: Georgia, serif;
+  overflow: hidden;
+}
+
+.card {
+  position: relative;
+  width: 340px;
+  height: 540px;
+  perspective: 1800px;
+}
+
+.inner {
+  position: absolute;
+  inset: 0;
+  border-radius: 28px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+}
+
+.cover {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top right, rgba(255,255,255,0.35), transparent 30%),
+    linear-gradient(135deg, #ff4f9a, #ff8fc8, #ffc0da);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #fff;
+  padding: 30px;
+  cursor: pointer;
+  transform-origin: left center;
+  transition: transform 1.8s cubic-bezier(.22,.61,.36,1);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+
+.cover h1 {
+  font-size: 2.3rem;
+  line-height: 1.35;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.hint {
+  margin-top: 20px;
+  font-size: 0.95rem;
+  opacity: 0.95;
+}
+
+.cover.open {
+  transform: rotateY(-165deg);
+}
+
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #000;
+  transform: scaleX(-1);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 24px;
+  pointer-events: none;
+}
+
+.reveal-text {
+  opacity: 0;
+  transform: scale(0.7);
+  transition: all 0.8s ease;
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(10px);
+  color: #ff2f7a;
+  padding: 18px 24px;
+  border-radius: 24px;
+  font-size: 1.8rem;
+  line-height: 1.4;
+  font-weight: bold;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.reveal-text.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.hearts {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.heart {
+  position: absolute;
+  bottom: -30px;
+  font-size: 24px;
+  animation: floatUp 4s linear forwards;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) scale(0.8);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-650px) scale(1.6) rotate(20deg);
+    opacity: 0;
+  }
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+</style>
+</head>
+<body>
+
+<div class="card pulse">
+  <div class="inner">
+    <video id="video" autoplay playsinline muted></video>
+
+    <div class="hearts" id="hearts"></div>
+
+    <div class="overlay">
+      <div class="reveal-text" id="revealText">
+        💖 Oh my God,<br>it's you 🫣
+      </div>
+    </div>
+  </div>
+
+  <div class="cover" id="cover">
+    <div>
+      <h1>💖 Meet My<br>Future Husband 💖</h1>
+      <div class="hint">Tap to Open ✨</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const cover = document.getElementById('cover');
+const video = document.getElementById('video');
+const revealText = document.getElementById('revealText');
+const hearts = document.getElementById('hearts');
+let opened = false;
+
+function createHeart() {
+  const heart = document.createElement('div');
+  heart.className = 'heart';
+  heart.innerHTML = ['💖','💕','💗','💘','💞'][Math.floor(Math.random() * 5)];
+  heart.style.left = Math.random() * 100 + '%';
+  heart.style.animationDuration = (3 + Math.random() * 2) + 's';
+  heart.style.fontSize = (18 + Math.random() * 22) + 'px';
+  hearts.appendChild(heart);
+
+  setTimeout(() => heart.remove(), 5000);
+}
+
+function startHearts() {
+  for (let i = 0; i < 12; i++) {
+    setTimeout(createHeart, i * 250);
+  }
+
+  setInterval(createHeart, 400);
+}
+
+cover.addEventListener('click', async () => {
+  if (opened) return;
+  opened = true;
+
+  cover.classList.add('open');
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'user' },
+      audio: false
+    });
+
+    video.srcObject = stream;
+
+    setTimeout(() => {
+      revealText.classList.add('show');
+      startHearts();
+    }, 1800);
+
+  } catch (error) {
+    alert('Please allow camera permission.');
+    console.error(error);
+  }
+});
+</script>
+
+</body>
+</html>
